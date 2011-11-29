@@ -17,12 +17,12 @@ for node in shared_companies.itervalues():
   s.add_node(node['id'], {'permalink': node['permalink'], 'label': node['label'], 'total': node['total']})
 
 for edge, item in enumerate(shared_edges):
-  s.add_edge(shared_edges[edge]['source'], shared_edges[edge]['target'])
+  s.add_edge(shared_edges[edge]['target'], shared_edges[edge]['source'])
 
 nx.write_gml(s, "shared_founders.gml")
 
-# investments graph
-i = nx.Graph()
+# directed investments graph
+i = nx.DiGraph()
 for node in investment_companies.itervalues():
   i.add_node(node['id'], {'permalink': node['permalink'], 'label': node['label'], 'total': node['total']})
 
