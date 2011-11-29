@@ -13,14 +13,10 @@ counter = 0
 for node, item in shared_companies.items():
   try:
     name=node.encode('latin-1')
-    s.add_node(shared_companies[node]['id']) #ADDING ID AS LABEL
+    s.add_node(shared_companies[node]['id'])
   except UnicodeEncodeError:
     counter += 1
 
-    # edge [
-    #   source 74527
-    #   target 74527
-    # ] THE FUCK
 for edge, item in enumerate(shared_edges):
   s.add_edge(shared_edges[edge]['source'], shared_edges[edge]['target'])
 
