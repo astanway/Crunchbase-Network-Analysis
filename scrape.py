@@ -20,9 +20,9 @@ for infile in listing:
     json_data = open(path + infile)
     data = json.load(json_data)
     company = {}
-    company['label'] = 1
+    company['startup'] = 1
     company['id'] = id
-    company['permalink'] = data['permalink']
+    company['label'] = data['permalink']
     company['total'] = 0
     shared_companies[data['permalink']] = company
     investment_companies[data['permalink']] = company
@@ -43,9 +43,9 @@ for infile in listing:
     #make sure it isn't a company investing in another company
     if not data['permalink'] in shared_companies:    
       firm = {}
-      firm['label'] = 0
+      firm['startup'] = 0
       firm['id'] = id
-      firm['permalink'] = data['permalink']
+      firm['label'] = data['permalink']
       firm['total'] = 0
       investment_companies[data['permalink']] = firm
       json_data.close()
@@ -66,9 +66,9 @@ for infile in listing:
       continue
 
     angel = {}
-    angel['label'] = 0
+    angel['startup'] = 0
     angel['id'] = id
-    angel['permalink'] = data['permalink']
+    angel['label'] = data['permalink']
     angel['total'] = 0
     investment_companies[data['permalink']] = angel
     json_data.close()

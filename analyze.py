@@ -6,7 +6,7 @@ from operator import itemgetter
 f = open('investments.gml', 'r')
 gml = f.read()
 gml = gml.split('\n')[1:]
-G = parse_gml(gml, relabel=False)
+G = parse_gml(gml)
 print "parsed"
  
 nG = nx.number_of_nodes(nx.connected_component_subgraphs(G)[0])
@@ -18,7 +18,7 @@ print edges
 f = open('shared_founders.gml', 'r')
 gml = f.read()
 gml = gml.split('\n')[1:]
-G = parse_gml(gml, relabel=False)
+G = parse_gml(gml)
 print "parsed"
  
 nG = nx.number_of_nodes(nx.connected_component_subgraphs(G)[0])
