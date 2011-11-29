@@ -3,8 +3,6 @@ import os
 import json
 import simplejson
 
-# This script uses json files downloaded individually from CrunchBase via the crunchbase_search project: https://github.com/dbasch/crunchbase_search
-
 investment_edges = []
 investment_companies = {}
 shared_edges = []
