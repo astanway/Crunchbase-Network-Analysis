@@ -10,14 +10,13 @@ shared_companies = {}
 
 id = 0 # get rid of this
 
-# json_data=open('investment_companies.js')
-# investment_companies = json.load(json_data)
-# 
-# json_data=open('shared_companies.js')
-# shared_companies = json.load(json_data)
-# 
+json_data=open('shared_companies.js')
+investment_companies = json.load(json_data)
 
-# BLAH! Some companies actually invest in OTHER companies - like Amazon, and LinkdIn. These guys aren't startups, though...
+json_data=open('shared_companies.js')
+shared_companies = json.load(json_data)
+
+
 # add company nodes first so the ids match across the two graphs
 path = 'companies/'
 listing = os.listdir(path)
@@ -45,15 +44,17 @@ for infile in listing:
   try:
     json_data = open(path + infile)
     data = json.load(json_data)
-
-    firm = {}
-    firm['label'] = 0
-    firm['id'] = id
-    firm['permalink'] = data['permalink']
-    firm['total'] = 0
-    investment_companies[data['permalink']] = firm
-    json_data.close()
-    id += 1
+    
+    #make sure it isn't a company investing in another company
+    if not data['permalink'] in shared_companies:    
+      firm = {}
+      firm['label'] = 0
+      firm['id'] = id
+      firm['permalink'] = data['permalink']
+      firm['total'] = 0
+      investment_companies[data['permalink']] = firm
+      json_data.close()
+      id += 1
 
   except ValueError:
     pass
@@ -102,6 +103,7 @@ for infile in listing:
       shared_companies[company['permalink']]['total'] += funding_round['raised_amount']
       investment_companies[company['permalink']]['total'] += funding_round['raised_amount']
       
+      # make sure the ids are consistent
       if shared_companies[company['permalink']]['id'] != investment_companies[company['permalink']]['id']:
         print company['permalink']
 
@@ -116,8 +118,7 @@ for infile in listing:
           elif investor['person'] != None:
             firm = investment_companies[investor['person']['permalink']]
         except KeyError:
-          print investor
-          continue
+          pass
 
         #add to the funding total for the firm
         firm['total'] += dilution
@@ -180,7 +181,7 @@ data = simplejson.dumps(investment_companies)
 FILE = open(filename,"w")
 FILE.writelines(data)
 FILE.close()
-# 
+
 filename = "shared_companies.js"
 data = simplejson.dumps(shared_companies)
 FILE = open(filename,"w")
