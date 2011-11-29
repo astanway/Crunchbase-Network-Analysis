@@ -3,19 +3,14 @@ import os
 import json
 import simplejson
 
+# This script uses json files downloaded individually from CrunchBase via the crunchbase_search project: https://github.com/dbasch/crunchbase_search
+
 investment_edges = []
 investment_companies = {}
 shared_edges = []
 shared_companies = {}
 
 id = 0
-
-# -- FOR EASY DEBUGGING --
-# json_data=open('investment_companies.js')
-# investment_companies = json.load(json_data)
-
-# json_data=open('shared_companies.js')
-# shared_companies = json.load(json_data)
 
 # add company nodes first so the ids match across the two graphs
 path = 'companies/'
