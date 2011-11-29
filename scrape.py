@@ -8,14 +8,14 @@ investment_companies = {}
 shared_edges = []
 shared_companies = {}
 
-id = 0 # get rid of this
+id = 0
 
-json_data=open('shared_companies.js')
-investment_companies = json.load(json_data)
+# -- FOR EASY DEBUGGING --
+# json_data=open('investment_companies.js')
+# investment_companies = json.load(json_data)
 
-json_data=open('shared_companies.js')
-shared_companies = json.load(json_data)
-
+# json_data=open('shared_companies.js')
+# shared_companies = json.load(json_data)
 
 # add company nodes first so the ids match across the two graphs
 path = 'companies/'
@@ -134,31 +134,45 @@ for infile in listing:
 
 
 # connect shared founders
+def check_roles(position):
+  roles = [
+    'ceo',
+    'founder',
+    'cto',
+    'coo',
+    'vp of engineering',
+    'vp of marketing',
+    'vp of business development',
+  ]
+  
+  for role in roles:
+    if position.lower().rfind(role) != -1:
+      return True
+
 path = 'people/'
 listing = os.listdir(path)
 for infile in listing:
   try:
-    json_data=open(path + infile)
+    json_data = open(path + infile)
     data = json.load(json_data)
     shared = []
-    for x, item in enumerate(data['relationships']):
-      if data['relationships'][x]['title'].lower().rfind("ceo") != -1 or data['relationships'][x]['title'].lower().rfind("founder") != -1 or data['relationships'][x]['title'].lower().rfind("creator") != -1:
+    for rel in data['relationships']:
+      if check_roles(rel['title']):
         try:
-          company = shared_companies[data['relationships'][x]['firm']['name']]
+          company = shared_companies[rel['firm']['permalink']]
           shared.append(company)        
 
         # catches people that have founded or ceo'd an investment firm, aot a startup
         except KeyError:
           continue
             
-    for x, item in enumerate(shared):
-      for i, item2 in enumerate(shared):
-        if shared[i]['id'] == shared[x]['id'] or x == i:
+    for x in shared:
+      for y in shared:
+        if x['id'] == y['id'] or x == y:
           continue
         edge = {}
-        edge['type'] = 'edge'
-        edge['source'] = shared[x]['id']
-        edge['target'] = shared[i]['id']
+        edge['source'] = x['id']
+        edge['target'] = y['id']
         shared_edges.append(edge)
   except ValueError:
     pass
