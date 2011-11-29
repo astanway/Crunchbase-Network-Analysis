@@ -1,9 +1,7 @@
-import json
 import sys
-import simplejson
 import os
-from pprint import pprint
-from copy import deepcopy
+import json
+import simplejson
 
 investment_edges = []
 investment_companies = {}
@@ -12,47 +10,60 @@ shared_companies = {}
 
 id = 0 # get rid of this
 
+# json_data=open('investment_companies.js')
+# investment_companies = json.load(json_data)
+# 
+# json_data=open('shared_companies.js')
+# shared_companies = json.load(json_data)
+# 
+
+# BLAH! Some companies actually invest in OTHER companies - like Amazon, and LinkdIn. These guys aren't startups, though...
 # add company nodes first so the ids match across the two graphs
 path = 'companies/'
 listing = os.listdir(path)
 for infile in listing:
   try:
-    json_data=open(path + infile)
+    json_data = open(path + infile)
     data = json.load(json_data)
-    node = {}
-    node['label'] = 1
-    node['id'] = id
-    node['permalink'] = data['permalink']
-    node['total'] = 0
-    shared_companies[data['permalink']] = node
-    investment_companies[data['permalink']] = node
+    company = {}
+    company['label'] = 1
+    company['id'] = id
+    company['permalink'] = data['permalink']
+    company['total'] = 0
+    shared_companies[data['permalink']] = company
+    investment_companies[data['permalink']] = company
     json_data.close()
     id += 1
 
   except ValueError:
-    print infile
+    pass
 
 #add investor nodes
 path = 'financial-organizations/'
 listing = os.listdir(path)
 for infile in listing:
-  json_data=open(path + infile)
-  data = json.load(json_data)
+  try:
+    json_data = open(path + infile)
+    data = json.load(json_data)
 
-  firm = {}
-  firm['label'] = 0
-  firm['id'] = id
-  firm['permalink'] = data['permalink']
-  firm['total'] = 0
-  investment_companies[data['permalink']] = firm
-  id += 1
+    firm = {}
+    firm['label'] = 0
+    firm['id'] = id
+    firm['permalink'] = data['permalink']
+    firm['total'] = 0
+    investment_companies[data['permalink']] = firm
+    json_data.close()
+    id += 1
+
+  except ValueError:
+    pass
   
 # add angel investors to firm list
 path = 'people/'
 listing = os.listdir(path)
 for infile in listing:
   try:
-    json_data=open(path + infile)
+    json_data = open(path + infile)
     data = json.load(json_data)
 
     if len(data['investments']) == 0:
@@ -64,44 +75,63 @@ for infile in listing:
     angel['permalink'] = data['permalink']
     angel['total'] = 0
     investment_companies[data['permalink']] = angel
+    json_data.close()
     id += 1
-    
-    print angel['name']
 
-  except KeyError:
-    print infile
-
+  except ValueError:
+    pass
 
 # connect companies with investors
-for data in shared_companies:
-  if len(data['funding_rounds']) == 0:
-    continue
+path = 'companies/'
+listing = os.listdir(path)
+for infile in listing:
+  try:
+    json_data = open(path + infile)
+    company = json.load(json_data)
+    
+    if not 'funding_rounds' in company:
+      continue
   
-  for z, item in enumerate(data['funding_rounds']):
-    try:
-      company = investment_companies[data['investments'][z]['funding_round']['company']['name']]
-      amount = data['investments'][z]['funding_round']['raised_amount']
-  
-      if amount == None:
-        continue
-  
-      edge = {}
-      edge['source'] = firm['id']
-      edge['target'] = company['id']
-      edge['value'] = amount
-  
-      #add to the respective funding totals
-      company['total'] += amount
-      firm['total'] += amount
-  
-      investment_edges.append(edge)
-  
-      json_data.close()
-  
-    except KeyError:
-      print data['investments'][z]['funding_round']['company']['name']
+    for funding_round in company['funding_rounds']:
 
+      # dirty data yo
+      if not funding_round['raised_amount'] or len(funding_round['investments']) == 0:
+        continue
+
+      # add the totals to the startups for each graph
+      shared_companies[company['permalink']]['total'] += funding_round['raised_amount']
+      investment_companies[company['permalink']]['total'] += funding_round['raised_amount']
+      
+      if shared_companies[company['permalink']]['id'] != investment_companies[company['permalink']]['id']:
+        print company['permalink']
+
+      dilution = funding_round['raised_amount'] / len(funding_round['investments'])  
+
+      for investor in funding_round['investments']:
+        try:
+          if investor['company'] != None:
+            firm = investment_companies[investor['company']['permalink']]
+          elif investor['financial_org'] != None:
+            firm = investment_companies[investor['financial_org']['permalink']]
+          elif investor['person'] != None:
+            firm = investment_companies[investor['person']['permalink']]
+        except KeyError:
+          print investor
+          continue
+
+        #add to the funding total for the firm
+        firm['total'] += dilution
+
+        edge = {}
+        edge['source'] = firm['id']
+        edge['target'] = shared_companies[company['permalink']]['id']
+        edge['value'] = dilution
+        investment_edges.append(edge)
   
+  except ValueError:
+    pass
+
+
 # connect shared founders
 path = 'people/'
 listing = os.listdir(path)
@@ -115,8 +145,10 @@ for infile in listing:
         try:
           company = shared_companies[data['relationships'][x]['firm']['name']]
           shared.append(company)        
+
+        # catches people that have founded or ceo'd an investment firm, aot a startup
         except KeyError:
-          continue # catches all the investment firms
+          continue
             
     for x, item in enumerate(shared):
       for i, item2 in enumerate(shared):
@@ -128,7 +160,7 @@ for infile in listing:
         edge['target'] = shared[i]['id']
         shared_edges.append(edge)
   except ValueError:
-    print infile
+    pass
 
 
 filename = "investment_edges.js"
@@ -148,7 +180,7 @@ data = simplejson.dumps(investment_companies)
 FILE = open(filename,"w")
 FILE.writelines(data)
 FILE.close()
-
+# 
 filename = "shared_companies.js"
 data = simplejson.dumps(shared_companies)
 FILE = open(filename,"w")
