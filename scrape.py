@@ -125,21 +125,20 @@ for infile in listing:
   except ValueError:
     pass
 
-
 # connect shared founders
 def check_roles(position):
   roles = [
-    'ceo',
+    'CEO',
     'founder',
-    'cto',
-    'coo',
-    'vp of engineering',
-    'vp of marketing',
-    'vp of business development',
+    'Founder',
+    'CTO',
+    'COO',
+    'Chief',
+    'Creator'
   ]
   
   for role in roles:
-    if position.lower().rfind(role) != -1:
+    if position.rfind(role) != -1:
       return True
 
 path = 'people/'
@@ -164,8 +163,9 @@ for infile in listing:
         if x['id'] == y['id'] or x == y:
           continue
         edge = {}
-        edge['source'] = x['id']
-        edge['target'] = y['id']
+        edge['source'] = x['label']
+        edge['target'] = y['label']
+        edge['person'] = data['permalink']
         shared_edges.append(edge)
   except ValueError:
     pass

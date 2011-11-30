@@ -12,11 +12,17 @@ def founder():
   for node in shared_companies.itervalues():
     s.add_node(node['id'], {'startup': node['startup'], 'label': node['label'], 'total': node['total']})
 
-  for edge, item in enumerate(shared_edges):
-    s.add_edge(shared_edges[edge]['target'], shared_edges[edge]['source'])
+  # if edge exists, update number of shared founders
+  #TODO: fix double bug
+  for edge in shared_edges:
+    if s.has_edge(edge['target'], edge['source']):
+      value = 1 + s.edge[edge['target']][edge['source']]['value']
+      s.add_edge(edge['target'], edge['source'], value=value)
+    else:
+      s.add_edge(edge['target'], edge['source'], value=1)
 
   # Uncomment to write graph to file
-  # nx.write_gml(s, "graphs/shared_founders.gml")
+  nx.write_gml(s, "graphs/shared_founders.gml")
   return s
 
 # directed investments graph
@@ -38,7 +44,7 @@ def investor():
   return i
   
 s = founder()
-i = investor()
+# i = investor()
 
 nG = nx.number_of_nodes(nx.connected_component_subgraphs(s)[0])
 nodes = nx.number_of_nodes(s)
