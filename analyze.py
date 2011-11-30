@@ -3,9 +3,9 @@ from networkx import *
 
 # shared founder graph
 def founder():
-  f = open("shared_companies.js")
+  f = open("graphs/shared_companies.js")
   shared_companies = json.load(f)
-  f = open("shared_edges.js")
+  f = open("graphs/shared_edges.js")
   shared_edges = json.load(f)
 
   s = nx.Graph()
@@ -16,14 +16,14 @@ def founder():
     s.add_edge(shared_edges[edge]['target'], shared_edges[edge]['source'])
 
   # Uncomment to write graph to file
-  # nx.write_gml(s, "shared_founders.gml")
+  # nx.write_gml(s, "graphs/shared_founders.gml")
   return s
 
 # directed investments graph
 def investor():
-  f = open("investment_companies.js")
+  f = open("graphs/investment_companies.js")
   investment_companies = json.load(f)
-  f = open("investment_edges.js")
+  f = open("graphs/investment_edges.js")
   investment_edges = json.load(f)
 
   i = nx.DiGraph()
@@ -34,7 +34,7 @@ def investor():
     i.add_edge(investment_edges[edge]['source'], investment_edges[edge]['target'], value=investment_edges[edge]['value'])
   
   # Uncomment to write graph to file
-  # nx.write_gml(i, "investments.gml")
+  # nx.write_gml(i, "graphs/investments.gml")
   return i
   
 s = founder()
