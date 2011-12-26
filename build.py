@@ -10,16 +10,15 @@ def founder():
 
   s = nx.Graph()
   for node in shared_companies.itervalues():
-    s.add_node(node['id'], {'startup': node['startup'], 'label': node['label'], 'total': node['total']})
+    s.add_node(node['id'], {'label': node['label'], 'total': node['total']})
 
   # if edge exists, update number of shared founders
-  #TODO: fix double bug
   for edge in shared_edges:
-    if s.has_edge(edge['target'], edge['source']):
-      value = 1 + s.edge[edge['target']][edge['source']]['value']
-      s.add_edge(edge['target'], edge['source'], value=value)
-    else:
-      s.add_edge(edge['target'], edge['source'], value=1)
+    # if s.has_edge(shared_companies[edge['target']]['id'], shared_companies[edge['source']]['id']):
+    #   value = 1 + s.get_edge(shared_companies[edge['target']]['id'], shared_companies[edge['source']]['id'])
+    #   s.add_edge(edge['target'], edge['source'], value=value)
+    # else:
+      s.add_edge(shared_companies[edge['target']]['id'], shared_companies[edge['source']]['id'], value=1)
 
   # Uncomment to write graph to file
   # nx.write_gml(s, "graphs/shared_founders.gml")
