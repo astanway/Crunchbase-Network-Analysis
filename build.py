@@ -14,10 +14,10 @@ def founder():
 
   # if edge exists, update number of shared founders
   for edge in shared_edges:
-    # if s.has_edge(shared_companies[edge['target']]['id'], shared_companies[edge['source']]['id']):
-    #   value = 1 + s.get_edge(shared_companies[edge['target']]['id'], shared_companies[edge['source']]['id'])
-    #   s.add_edge(edge['target'], edge['source'], value=value)
-    # else:
+    if s.has_edge(shared_companies[edge['target']]['id'], shared_companies[edge['source']]['id']):
+      value = 1 + s.get_edge(shared_companies[edge['target']]['id'], shared_companies[edge['source']]['id'])
+      s.add_edge(edge['target'], edge['source'], value=value)
+    else:
       s.add_edge(shared_companies[edge['target']]['id'], shared_companies[edge['source']]['id'], value=1)
 
   # Uncomment to write graph to file
