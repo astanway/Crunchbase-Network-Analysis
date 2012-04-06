@@ -8,4 +8,4 @@ All data was scraped from Crunchbase using the
 [crunchbase_search project](https://github.com/dbasch/crunchbase_search). It is then compiled into JSON graphs which are then fed into Networkx for super-sweet-analysis. Also, it turns out building to GML and then reading it back in is heinously slow. So, for all analysis, I don't actually use the GML files - I just use all my downloaded Crunchbase files and build the graph inline.
 
 ## Analysis
-Stay tuned, fool.
+See included PDF. All graphs in datavis folder. TL;DR, network position has little bearing on how much capital you raise.
